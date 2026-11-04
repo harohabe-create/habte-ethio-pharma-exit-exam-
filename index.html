@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Habtamu's Academic Hub - Ethiopian Pharmacy Exit Exam Portal</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary-navy: #0D233A;
+      --secondary-navy: #1A365D;
+      --accent-teal: #00A896;
+      --accent-teal-light: #E6F7F5;
+      --accent-amber: #D97706;
+      --accent-green: #059669;
+      --accent-red: #DC2626;
+      --bg-slate: #F8FAFC;
+      --card-bg: #FFFFFF;
+      --text-main: #0F172A;
+      --text-muted: #64748B;
+      --border-color: #E2E8F0;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+    body { background-color: var(--bg-slate); color: var(--text-main); line-height: 1.6; }
+
+    /* Sticky Navigation */
+    .navbar {
+      position: sticky; top: 0; z-index: 1000;
+      background-color: var(--primary-navy);
+      color: white; padding: 0.85rem 1.5rem;
+      display: flex; justify-content: space-between; align-items: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .brand-logo { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; color: white; }
+    .brand-icon {
+      width: 40px; height: 40px; background: var(--accent-teal);
+      border-radius: 10px; display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; font-weight: bold; color: white;
+    }
+    .brand-text h1 { font-size: 1.15rem; font-weight: 700; line-height: 1.2; letter-spacing: -0.02em; }
+    .brand-text p { font-size: 0.72rem; color: var(--accent-teal); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+
+    .nav-actions { display: flex; gap: 0.75rem; align-items: center; }
+    .btn-small { padding: 0.45rem 0.9rem; border-radius: 6px; font-weight: 600; font-size: 0.85rem; cursor: pointer; border: none; transition: all 0.2s; }
+    .btn-outline { background: transparent; border: 1px solid var(--accent-teal); color: var(--accent-teal); }
+    .btn-outline:hover { background: rgba(0,168,150,0.1); }
+    .btn-teal { background: var(--accent-teal); color: white; }
+    .btn-teal:hover { background: #008f80; }
+
+    /* Hero Landing Section */
+    .hero {
+      background: linear-gradient(135deg, var(--primary-navy) 0%, var(--secondary-navy) 100%);
+      color: white; padding: 3.5rem 1.5rem 4rem; text-align: center; position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+      background: radial-gradient(circle, rgba(0,168,150,0.1) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: rgba(0,168,150,0.2); border: 1px solid var(--accent-teal);
+      color: var(--accent-teal-light); padding: 0.35rem 0.9rem; border-radius: 20px;
+      font-size: 0.82rem; font-weight: 600; margin-bottom: 1.25rem;
+    }
+    .hero-title { font-size: 2.2rem; font-weight: 800; line-height: 1.25; margin-bottom: 1rem; max-width: 850px; margin-left: auto; margin-right: auto; }
+    .hero-title span { color: var(--accent-teal); }
+    .hero-subtitle { font-size: 1.05rem; color: #94A3B8; max-width: 680px; margin: 0 auto 2rem; font-weight: 400; }
+
+    .price-callout {
+      background: rgba(255,255,255,0.06); border: 1px dashed rgba(0,168,150,0.5);
+      border-radius: 12px; padding: 0.85rem 1.25rem; display: inline-flex;
+      align-items: center; gap: 1rem; margin-bottom: 2rem;
+    }
+    .price-tag { background: var(--accent-amber); color: white; padding: 0.25rem 0.6rem; border-radius: 6px; font-weight: 700; font-size: 0.9rem; }
+
+    .hero-cta-group { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
+    .btn-hero { padding: 0.85rem 1.8rem; border-radius: 8px; font-weight: 700; font-size: 1rem; cursor: pointer; border: none; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; transition: transform 0.2s, box-shadow 0.2s; }
+    .btn-hero:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,168,150,0.3); }
+
+    /* Landing Feature Strip */
+    .features-strip {
+      background: white; border-bottom: 1px solid var(--border-color);
+      padding: 1.5rem 1.5rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem; max-width: 1200px; margin: 0 auto;
+    }
+    .feature-item { display: flex; align-items: flex-start; gap: 0.85rem; }
+    .feature-icon { background: var(--accent-teal-light); color: var(--accent-teal); width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+    .feature-text h4 { font-size: 0.95rem; font-weight: 700; color: var(--text-main); }
+    .feature-text p { font-size: 0.8rem; color: var(--text-muted); }
+
+    /* Interactive Demo Container */
+    .demo-section { max-width: 900px; margin: 2.5rem auto 1rem; padding: 0 1rem; }
+    .card { background: white; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden; margin-bottom: 2rem; }
+    .card-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: #FAFDFD; }
+    .card-title { font-size: 1.1rem; font-weight: 700; color: var(--primary-navy); display: flex; align-items: center; gap: 0.5rem; }
+    .badge-free { background: #DEF7EC; color: #03543F; font-size: 0.72rem; font-weight: 700; padding: 0.2rem 0.55rem; border-radius: 12px; text-transform: uppercase; }
+
+    /* Catalog Section */
+    .section-container { max-width: 1200px; margin: 2.5rem auto; padding: 0 1.25rem; }
+    .section-header { text-align: center; margin-bottom: 2rem; }
+    .section-header h2 { font-size: 1.75rem; font-weight: 800; color: var(--primary-navy); }
+    .section-header p { color: var(--text-muted); font-size: 0.95rem; }
+
+    .subject-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.25rem; }
+    .subject-card {
+      background: white; border: 1px solid var(--border-color); border-radius: 12px;
+      padding: 1.25rem; transition: all 0.25s ease; cursor: pointer; position: relative; display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .subject-card:hover { transform: translateY(-4px); border-color: var(--accent-teal); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+    .subject-icon { width: 44px; height: 44px; border-radius: 10px; background: var(--bg-slate); color: var(--primary-navy); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; margin-bottom: 0.85rem; }
+    .subject-card:hover .subject-icon { background: var(--accent-teal); color: white; }
+    .subject-title { font-size: 1.05rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.35rem; }
+    .subject-desc { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem; flex-grow: 1; }
+    .subject-meta { display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; font-weight: 600; padding-top: 0.75rem; border-top: 1px solid var(--border-color); }
+    .batch-tag { color: var(--accent-teal); }
+    .price-mini { background: #FEF3C7; color: #92400E; padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 700; }
+
+    /* Batches Modal / Drawer */
+    .drawer-overlay {
+      position: fixed; inset: 0; background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(4px);
+      z-index: 2000; display: none; align-items: center; justify-content: center; padding: 1rem;
+    }
+    .drawer-overlay.active { display: flex; }
+    .drawer-content {
+      background: white; width: 100%; max-width: 580px; border-radius: 16px;
+      max-height: 90vh; overflow-y: auto; padding: 1.5rem; box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+      animation: modalUp 0.25s ease-out;
+    }
+    @keyframes modalUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+    .drawer-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem; }
+    .close-btn { background: transparent; border: none; font-size: 1.25rem; color: var(--text-muted); cursor: pointer; }
+
+    .batch-list { display: flex; flex-direction: column; gap: 0.85rem; margin-bottom: 1.5rem; }
+    .batch-item {
+      border: 1px solid var(--border-color); border-radius: 10px; padding: 1rem;
+      display: flex; justify-content: space-between; align-items: center; transition: all 0.2s;
+    }
+    .batch-item.unlocked { border-color: var(--accent-teal); background: var(--accent-teal-light); }
+    .batch-info h5 { font-size: 0.95rem; font-weight: 700; }
+    .batch-info p { font-size: 0.78rem; color: var(--text-muted); }
+
+    /* Payment Option Trigger */
+    .payment-box { background: var(--bg-slate); border-radius: 12px; padding: 1.25rem; margin-top: 1rem; border: 1px solid var(--border-color); }
+    .pay-methods { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin: 0.85rem 0; }
+    .pay-btn {
+      border: 1px solid var(--border-color); background: white; border-radius: 8px;
+      padding: 0.6rem 0.2rem; text-align: center; cursor: pointer; font-size: 0.78rem; font-weight: 700; transition: all 0.2s;
+    }
+    .pay-btn:hover, .pay-btn.selected { border-color: var(--accent-teal); background: var(--accent-teal-light); color: var(--accent-teal); }
+
+    /* Interactive Quiz Workspace */
+    .quiz-workspace { display: none; max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
+    .quiz-header { background: var(--primary-navy); color: white; padding: 1rem 1.5rem; border-radius: 12px 12px 0 0; display: flex; justify-content: space-between; align-items: center; }
+    .question-box { background: white; padding: 1.75rem; border: 1px solid var(--border-color); border-bottom: none; }
+    .question-text { font-size: 1.1rem; font-weight: 600; color: var(--text-main); margin-bottom: 1.25rem; }
+    .options-list { display: flex; flex-direction: column; gap: 0.75rem; }
+    .option-btn {
+      background: white; border: 1px solid var(--border-color); padding: 0.9rem 1.1rem; border-radius: 8px;
+      text-align: left; cursor: pointer; font-size: 0.92rem; font-weight: 500; transition: all 0.2s; display: flex; align-items: center; gap: 0.75rem;
+    }
+    .option-btn:hover { border-color: var(--accent-teal); background: var(--bg-slate); }
+    .option-btn.correct { background: #DEF7EC !important; border-color: var(--accent-green) !important; color: #03543F; font-weight: 700; }
+    .option-btn.incorrect { background: #FDE8E8 !important; border-color: var(--accent-red) !important; color: #9B1C1C; }
+
+    .rationale-box {
+      display: none; background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 8px;
+      padding: 1.1rem; margin-top: 1.25rem; font-size: 0.88rem; color: #166534;
+    }
+    .rationale-box.active { display: block; }
+    .quiz-footer { background: white; padding: 1rem 1.5rem; border: 1px solid var(--border-color); border-radius: 0 0 12px 12px; display: flex; justify-content: space-between; align-items: center; }
+
+    @media (max-width: 768px) {
+      .hero-title { font-size: 1.65rem; }
+      .features-strip { grid-template-columns: 1fr; }
+      .pay-methods { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sticky Navbar -->
+  <nav class="navbar">
+    <a href="#" class="brand-logo" onclick="showLandingPage()">
+      <div class="brand-icon">RM</div>
+      <div class="brand-text">
+        <h1>Habtamu's Academic Hub</h1>
+        <p>Research Mentorship Hub</p>
+      </div>
+    </a>
+    <div class="nav-actions">
+      <button class="btn-small btn-outline" onclick="scrollToCatalog()"><i class="fa-solid fa-book-open"></i> Subjects</button>
+      <button class="btn-small btn-teal" onclick="openPaymentDrawer('Pharmaceutical Analysis I', 1)"><i class="fa-solid fa-bolt"></i> Unlock Batch</button>
+    </div>
+  </nav>
+
+  <!-- Hero Landing Section -->
+  <header class="hero" id="heroSection">
+    <div class="hero-badge"><i class="fa-solid fa-graduation-cap"></i> Ethiopian Pharmacy National Exit Exam & Licensing Portal</div>
+    <h1 class="hero-title">Master B.Pharm Exit Exams with <span>Targeted 20-Question Batches</span></h1>
+    <p class="hero-subtitle">Continuous practice for Ethiopian pharmacy candidates. Learn anytime without expensive packages—unlock individual subject batches for pennies.</p>
+    
+    <div class="price-callout">
+      <span class="price-tag">3 BIRR</span>
+      <span style="font-size:0.9rem; font-weight:600;">Per 20-Question Exam Batch + Detailed Explanations</span>
+    </div>
+
+    <div class="hero-cta-group">
+      <button class="btn-hero btn-teal" onclick="scrollToCatalog()"><i class="fa-solid fa-layer-group"></i> Explore All Subjects</button>
+      <button class="btn-hero" style="background: rgba(255,255,255,0.15); color: white;" onclick="launchDemoQuiz()"><i class="fa-solid fa-play"></i> Try Free Demo</button>
+    </div>
+  </header>
+
+  <!-- Features Strip -->
+  <section class="features-strip">
+    <div class="feature-item">
+      <div class="feature-icon"><i class="fa-solid fa-coins"></i></div>
+      <div class="feature-text">
+        <h4>Micro-Payments</h4>
+        <p>Pay only 3 Birr per 20 questions as you progress.</p>
+      </div>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon"><i class="fa-solid fa-list-check"></i></div>
+      <div class="feature-text">
+        <h4>Granular Subjects</h4>
+        <p>Focus on Analysis, Pharmacology, Chemistry, etc.</p>
+      </div>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon"><i class="fa-solid fa-brain"></i></div>
+      <div class="feature-text">
+        <h4>Clinical Rationales</h4>
+        <p>Comprehensive explanations for every question option.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Free Sample Question Section -->
+  <section class="demo-section" id="demoSection">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><i class="fa-solid fa-vial-circle-check" style="color: var(--accent-teal);"></i> Free Interactive Sample — Pharmaceutical Analysis I</div>
+        <span class="badge-free">Free Preview</span>
+      </div>
+      <div style="padding: 1.5rem;">
+        <p class="question-text">In high-performance liquid chromatography (HPLC), what is the primary purpose of using a guard column upstream of the analytical column?</p>
+        <div class="options-list" id="sampleOptions">
+          <button class="option-btn" onclick="checkSample(this, false)"><span style="width:24px; height:24px; border-radius:50%; background:#F1F5F9; display:inline-flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:bold;">A</span> Increase flow rate through detector</button>
+          <button class="option-btn" onclick="checkSample(this, true)"><span style="width:24px; height:24px; border-radius:50%; background:#F1F5F9; display:inline-flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:bold;">B</span> Protect analytical column from particulates & irreversible contaminants</button>
+          <button class="option-btn" onclick="checkSample(this, false)"><span style="width:24px; height:24px; border-radius:50%; background:#F1F5F9; display:inline-flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:bold;">C</span> Alter mobile phase pH automatically</button>
+          <button class="option-btn" onclick="checkSample(this, false)"><span style="width:24px; height:24px; border-radius:50%; background:#F1F5F9; display:inline-flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:bold;">D</span> Regenerate mobile phase solvent online</button>
+        </div>
+        <div class="rationale-box" id="sampleRationale">
+          <strong><i class="fa-solid fa-circle-check"></i> Correct! Rationale:</strong> A guard column is a short protective column placed between the injector and analytical column. It traps particulate matter and strongly bound chemical contaminants, significantly prolonging analytical column lifespan.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Granular Subject Catalog -->
+  <section class="section-container" id="catalogSection">
+    <div class="section-header">
+      <h2>National Pharmacy Curriculum Catalog</h2>
+      <p>Select any subject to study in structured 20-question micro-batches</p>
+    </div>
+
+    <div class="subject-grid" id="subjectGrid">
+      <!-- Subjects injected dynamically via JavaScript -->
+    </div>
+  </section>
+
+  <!-- Interactive In-Page Quiz Workspace -->
+  <section class="quiz-workspace" id="quizWorkspace">
+    <div class="quiz-header">
+      <div>
+        <h3 id="quizSubjectTitle" style="font-size:1.1rem; font-weight:700;">Pharmaceutical Analysis I</h3>
+        <span id="quizBatchSub" style="font-size:0.8rem; color: var(--accent-teal-light);">Batch 1 (Questions 1 - 20)</span>
+      </div>
+      <button class="btn-small btn-outline" style="color:white; border-color:white;" onclick="closeQuiz()"><i class="fa-solid fa-xmark"></i> Close Quiz</button>
+    </div>
+    
+    <div class="question-box">
+      <p style="font-size:0.8rem; font-weight:700; color: var(--accent-teal); margin-bottom: 0.5rem;" id="questionCounter">Question 1 of 20</p>
+      <p class="question-text" id="activeQuestionText">Loading Question...</p>
+      <div class="options-list" id="activeOptionsList">
+        <!-- Dynamic Options -->
+      </div>
+      <div class="rationale-box" id="activeRationaleBox">
+        <!-- Dynamic Rationale -->
+      </div>
+    </div>
+
+    <div class="quiz-footer">
+      <button class="btn-small btn-outline" id="prevBtn" onclick="navigateQuiz(-1)"><i class="fa-solid fa-arrow-left"></i> Previous</button>
+      <span style="font-size:0.85rem; font-weight:600; color: var(--text-muted);" id="quizScoreTracker">Score: 0 / 20</span>
+      <button class="btn-small btn-teal" id="nextBtn" onclick="navigateQuiz(1)">Next Question <i class="fa-solid fa-arrow-right"></i></button>
+    </div>
+  </section>
+
+  <!-- Micro-Payment & Batch Selection Drawer -->
+  <div class="drawer-overlay" id="drawerOverlay">
+    <div class="drawer-content">
+      <div class="drawer-header">
+        <h4 id="drawerSubjectTitle" style="font-weight:800; color: var(--primary-navy);">Select Question Batch</h4>
+        <button class="close-btn" onclick="closeDrawer()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <p style="font-size:0.85rem; color: var(--text-muted); margin-bottom: 1rem;">Each batch contains 20 high-yield licensing exam questions with full clinical rationales.</p>
+
+      <div class="batch-list" id="drawerBatchList">
+        <!-- Batches loaded dynamically -->
+      </div>
+
+      <div class="payment-box">
+        <h5 style="font-size:0.9rem; font-weight:700; margin-bottom:0.35rem;">Unlock Batch (3 Birr / Penny-Pay)</h5>
+        <p style="font-size:0.78rem; color: var(--text-muted);">Choose payment method to instantly unlock without leaving this page:</p>
+        
+        <div class="pay-methods">
+          <div class="pay-btn selected"><i class="fa-solid fa-mobile-screen" style="color:#00A896;"></i> TeleBirr</div>
+          <div class="pay-btn"><i class="fa-solid fa-building-columns" style="color:#1A365D;"></i> CBE Birr</div>
+          <div class="pay-btn"><i class="fa-solid fa-star" style="color:#D97706;"></i> Telegram Stars</div>
+        </div>
+
+        <button class="btn-small btn-teal" style="width:100%; padding:0.75rem; font-size:0.95rem; font-weight:700; margin-top:0.5rem;" onclick="processInPagePayment()">
+          <i class="fa-solid fa-lock-open"></i> Pay 3 Birr & Start Practicing
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Subjects Master Catalog Mapping
+    const subjectsData = [
+      { id: 'pa1', name: 'Pharmaceutical Analysis I', desc: 'Titrations, UV-Vis Spectrometry, Chromatography, Quality Control', batches: 6, icon: 'fa-vial' },
+      { id: 'pa2', name: 'Pharmaceutical Analysis II', desc: 'NMR, Mass Spectrometry, HPLC, Validation, Method Development', batches: 5, icon: 'fa-flask' },
+      { id: 'medchem1', name: 'Medicinal Chemistry I', desc: 'SAR, Drug Metabolism, Autonomic Agents, Antibacterials', batches: 7, icon: 'fa-tablets' },
+      { id: 'medchem2', name: 'Medicinal Chemistry II', desc: 'Cardiovascular, CNS, Anticancer, Endocrine Agents', batches: 6, icon: 'fa-capsules' },
+      { id: 'pharmaceutics', name: 'Pharmaceutics & Dosage Forms', desc: 'Formulations, Tablets, Steriles, Suspensions, Excipients', batches: 8, icon: 'fa-pills' },
+      { id: 'pharmacology', name: 'Pharmacology & Therapeutics', desc: 'Pharmacodynamics, Adverse Effects, Drug Interactions', batches: 10, icon: 'fa-heart-pulse' },
+      { id: 'pharmacokinetics', name: 'Biopharmaceutics & PK', desc: 'Clearance, Bioavailability, Half-life, Compartment Models', batches: 5, icon: 'fa-chart-line' },
+      { id: 'law', name: 'Pharmacy Law & Ethics', desc: 'EFDA Regulations, Narcotic Control, Professional Ethics', batches: 4, icon: 'fa-scale-balanced' }
+    ];
+
+    // Sample Question Pool
+    const sampleQuestions = [
+      {
+        q: "Which analytical separation technique is best suited for non-volatile, heat-sensitive pharmaceutical drugs?",
+        options: ["Gas Chromatography (GC)", "Reversed-Phase HPLC", "Thin Layer Chromatography", "Gravimetric Titration"],
+        correct: 1,
+        rationale: "Reversed-Phase HPLC operates at ambient temperatures with liquid mobile phases, making it ideal for non-volatile or thermally labile organic pharmaceutical molecules."
+      },
+      {
+        q: "What is the primary mechanism of action of fluoroquinolone antibiotics like Ciprofloxacin?",
+        options: ["Inhibition of bacterial cell wall synthesis", "Inhibition of DNA Gyrase and Topoisomerase IV", "Binding to 30S ribosomal subunit", "Inhibition of Dihydrofolate Reductase"],
+        correct: 1,
+        rationale: "Fluoroquinolones inhibit bacterial DNA Gyrase (Gram-negative) and Topoisomerase IV (Gram-positive), preventing DNA replication and transcription."
+      }
+    ];
+
+    let currentSubject = null;
+    let currentBatchIndex = 1;
+    let currentQuestionIndex = 0;
+    let quizScore = 0;
+
+    // Initialize Page
+    document.addEventListener('DOMContentLoaded', () => {
+      renderSubjectCatalog();
+    });
+
+    function renderSubjectCatalog() {
+      const grid = document.getElementById('subjectGrid');
+      grid.innerHTML = subjectsData.map(s => `
+        <div class="subject-card" onclick="openPaymentDrawer('${s.name}', ${s.batches})">
+          <div>
+            <div class="subject-icon"><i class="fa-solid ${s.icon}"></i></div>
+            <div class="subject-title">${s.name}</div>
+            <div class="subject-desc">${s.desc}</div>
+          </div>
+          <div class="subject-meta">
+            <span class="batch-tag"><i class="fa-solid fa-boxes-stacked"></i> ${s.batches} Batches (120+ Qs)</span>
+            <span class="price-mini">3 Birr / Batch</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function checkSample(btn, isCorrect) {
+      const opts = document.querySelectorAll('#sampleOptions .option-btn');
+      opts.forEach(o => o.classList.remove('correct', 'incorrect'));
+      
+      if (isCorrect) {
+        btn.classList.add('correct');
+      } else {
+        btn.classList.add('incorrect');
+      }
+      document.getElementById('sampleRationale').classList.add('active');
+    }
+
+    function openPaymentDrawer(subjectName, batchCount) {
+      currentSubject = subjectName;
+      document.getElementById('drawerSubjectTitle').innerText = subjectName;
+      
+      const batchList = document.getElementById('drawerBatchList');
+      let html = '';
+      for (let i = 1; i <= batchCount; i++) {
+        const isUnlocked = i === 1 || localStorage.getItem(`unlocked_${subjectName}_${i}`);
+        html += `
+          <div class="batch-item ${isUnlocked ? 'unlocked' : ''}">
+            <div class="batch-info">
+              <h5>Batch ${i} (Questions ${((i-1)*20)+1} - ${i*20})</h5>
+              <p>${isUnlocked ? 'Unlocked & Ready' : '20 High-yield exam items + Rationales'}</p>
+            </div>
+            <div>
+              ${isUnlocked 
+                ? `<button class="btn-small btn-teal" onclick="startQuiz('${subjectName}', ${i})"><i class="fa-solid fa-play"></i> Practice</button>`
+                : `<button class="btn-small btn-outline" onclick="selectBatchForPay(${i})"><i class="fa-solid fa-lock"></i> 3 Birr</button>`
+              }
+            </div>
+          </div>
+        `;
+      }
+      batchList.innerHTML = html;
+      document.getElementById('drawerOverlay').classList.add('active');
+    }
+
+    function closeDrawer() {
+      document.getElementById('drawerOverlay').classList.remove('active');
+    }
+
+    function selectBatchForPay(batchIdx) {
+      currentBatchIndex = batchIdx;
+    }
+
+    function processInPagePayment() {
+      // Simulate direct micro-payment verification
+      localStorage.setItem(`unlocked_${currentSubject}_${currentBatchIndex}`, 'true');
+      alert(`Payment of 3 Birr successful! Batch ${currentBatchIndex} unlocked.`);
+      closeDrawer();
+      startQuiz(currentSubject, currentBatchIndex);
+    }
+
+    function startQuiz(subjectName, batchIdx) {
+      currentSubject = subjectName;
+      currentBatchIndex = batchIdx;
+      currentQuestionIndex = 0;
+      quizScore = 0;
+
+      document.getElementById('quizSubjectTitle').innerText = subjectName;
+      document.getElementById('quizBatchSub').innerText = `Batch ${batchIdx} (Questions ${((batchIdx-1)*20)+1} - ${batchIdx*20})`;
+      
+      closeDrawer();
+      document.getElementById('quizWorkspace').style.display = 'block';
+      document.getElementById('quizWorkspace').scrollIntoView({ behavior: 'smooth' });
+
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      const q = sampleQuestions[currentQuestionIndex % sampleQuestions.length];
+      document.getElementById('questionCounter').innerText = `Question ${currentQuestionIndex + 1} of 20`;
+      document.getElementById('activeQuestionText').innerText = q.q;
+
+      const optsBox = document.getElementById('activeOptionsList');
+      optsBox.innerHTML = q.options.map((opt, idx) => `
+        <button class="option-btn" onclick="submitAnswer(this, ${idx === q.correct})">
+          <span style="width:24px; height:24px; border-radius:50%; background:#F1F5F9; display:inline-flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:bold;">${String.fromCharCode(65+idx)}</span>
+          ${opt}
+        </button>
+      `).join('');
+
+      document.getElementById('activeRationaleBox').classList.remove('active');
+      document.getElementById('activeRationaleBox').innerHTML = `<strong>Rationale:</strong> ${q.rationale}`;
+      document.getElementById('quizScoreTracker').innerText = `Score: ${quizScore} / 20`;
+    }
+
+    function submitAnswer(btn, isCorrect) {
+      const allOpts = document.querySelectorAll('#activeOptionsList .option-btn');
+      allOpts.forEach(o => o.disabled = true);
+
+      if (isCorrect) {
+        btn.classList.add('correct');
+        quizScore++;
+      } else {
+        btn.classList.add('incorrect');
+      }
+      document.getElementById('activeRationaleBox').classList.add('active');
+      document.getElementById('quizScoreTracker').innerText = `Score: ${quizScore} / 20`;
+    }
+
+    function navigateQuiz(dir) {
+      currentQuestionIndex += dir;
+      if (currentQuestionIndex < 0) currentQuestionIndex = 0;
+      if (currentQuestionIndex >= 20) {
+        alert(`Batch Complete! Your final score: ${quizScore} / 20`);
+        closeQuiz();
+        return;
+      }
+      loadQuestion();
+    }
+
+    function closeQuiz() {
+      document.getElementById('quizWorkspace').style.display = 'none';
+      document.getElementById('heroSection').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function scrollToCatalog() {
+      document.getElementById('catalogSection').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function showLandingPage() {
+      closeQuiz();
+      document.getElementById('heroSection').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function launchDemoQuiz() {
+      document.getElementById('demoSection').scrollIntoView({ behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>
