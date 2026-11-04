@@ -1,10 +1,10 @@
-// Habtamu's Academic Hub - Strict 3-Trial & Direct Payment Module
+// Habtamu's Academic Hub - Strict 3-Trial & Permanent Lock Module
 (function() {
-    // Check or initialize trial count in browser storage
     let trials = parseInt(localStorage.getItem('habte_trials') || '0');
     const maxTrials = 3;
+    const isPaid = localStorage.getItem('habte_is_paid') === 'true';
 
-    // Inject payment & lock styles
+    // Inject styles
     const style = document.createElement('style');
     style.innerHTML = `
         .locked-overlay {
@@ -14,7 +14,9 @@
             border-radius: 12px;
             text-align: center;
             font-family: sans-serif;
-            margin: 20px 0;
+            margin: 20px auto;
+            max-width: 500px;
+            box-sizing: border-box;
             border: 2px solid #00A896;
         }
         .pay-box {
@@ -28,30 +30,46 @@
     `;
     document.head.appendChild(style);
 
+    // Run lock check immediately if already out of trials or not paid
+    window.addEventListener('DOMContentLoaded', () => {
+        if (!isPaid && trials >= maxTrials) {
+            triggerPaymentLock();
+        }
+    });
+
     // Global function for student answering/clicking
     window.checkTrialLimit = function(callbackFunction) {
+        if (localStorage.getItem('habte_is_paid') === 'true') {
+            if (typeof callbackFunction === 'function') callbackFunction();
+            return;
+        }
+
         trials = parseInt(localStorage.getItem('habte_trials') || '0');
         
         if (trials < maxTrials) {
             trials++;
             localStorage.setItem('habte_trials', trials);
-            console.log(`Trial ${trials} of ${maxTrials}`);
             if (typeof callbackFunction === 'function') callbackFunction();
+            
+            // If this click hits the limit, lock immediately
+            if (trials >= maxTrials) {
+                triggerPaymentLock();
+            }
         } else {
             triggerPaymentLock();
         }
     };
 
     function triggerPaymentLock() {
-        // Find main content container or body and replace with payment wall
+        // Hide normal page elements or replace container content
         const container = document.querySelector('.container') || document.body;
         container.innerHTML = `
             <div class="locked-overlay">
                 <h3 style="color:#00A896; margin-top:0;">🔒 Free Trial Limit Reached</h3>
-                <p style="font-size:13px; color:#cbd5e1;">You have used your ${maxTrials} free practice attempts. To unlock this batch and access all high-yield questions with clinical rationales, please complete the 3 ETB payment below:</p>
+                <p style="font-size:13px; color:#cbd5e1;">You have used your ${maxTrials} free practice attempts. To unlock full access to all questions and clinical rationales, please pay 3 ETB via Telebirr or CBE below:</p>
                 
                 <div class="pay-box">
-                    <h4 style="color:#0D233A; margin-top:0; margin-bottom:8px;">💳 Choose Payment Method (3 ETB)</h4>
+                    <h4 style="color:#0D233A; margin-top:0; margin-bottom:8px;">💳 Account Details (3 ETB)</h4>
                     
                     <!-- Telebirr Option -->
                     <div style="background:#f4fbfb; border-left:4px solid #00A896; padding:10px; border-radius:6px; margin-bottom:8px;">
@@ -77,7 +95,7 @@
                         <input type="text" id="studentRef" placeholder="e.g. TXN12345 or 0911..." style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px; font-size:13px; box-sizing:border-box;">
                     </div>
 
-                    <button onclick="submitStudentPayment()" style="width:100%; background:#00A896; color:white; border:none; padding:12px; border-radius:6px; font-weight:bold; font-size:14px; cursor:pointer;">Submit Payment & Request Access</button>
+                    <button onclick="submitStudentPayment()" style="width:100%; background:#00A896; color:white; border:none; padding:12px; border-radius:6px; font-weight:bold; font-size:14px; cursor:pointer;">Submit Payment Reference</button>
                 </div>
             </div>
         `;
@@ -90,7 +108,6 @@ function submitStudentPayment() {
         alert('Please enter your transaction reference or phone number.');
         return;
     }
-    alert('Thank you! Reference submitted. Once verified by Habtamu, access will be restored.');
-    localStorage.setItem('habte_trials', '0'); // Reset or handle validation logic
-    location.reload();
+    alert('Thank you! Reference submitted. Once you verify payment, you can grant access.');
+    // Keep them locked out until you verify and clear their storage or build backend validation.
 }
