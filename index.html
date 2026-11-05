@@ -523,5 +523,23 @@
   <div id="payment-container"></div>
   <script src="payment.js"></script>
   <script src="payment.js"></script>
+  function startQuiz(subjectName, batchIdx) {
+    // Check if the user is within trial limits before launching the quiz workspace
+    window.checkTrialLimit(function() {
+        currentSubject = subjectName;
+        currentBatchIndex = batchIdx;
+        currentQuestionIndex = 0;
+        quizScore = 0;
+
+        document.getElementById('quizSubjectTitle').innerText = subjectName;
+        document.getElementById('quizBatchSub').innerText = `Batch ${batchIdx} (Questions ${((batchIdx-1)*20)+1} - ${batchIdx*20})`;
+        
+        closeDrawer();
+        document.getElementById('quizWorkspace').style.display = 'block';
+        document.getElementById('quizWorkspace').scrollIntoView({ behavior: 'smooth' });
+
+        loadQuestion();
+    });
+}
 </body>
 </html>
