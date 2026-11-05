@@ -4,7 +4,7 @@
     const maxTrials = 3;
     const isPaid = localStorage.getItem('habte_is_paid') === 'true';
 
-    // Inject styles
+    // Inject styles for the locked overlay and payment box
     const style = document.createElement('style');
     style.innerHTML = `
         .locked-overlay {
@@ -30,14 +30,14 @@
     `;
     document.head.appendChild(style);
 
-    // Run lock check immediately if already out of trials or not paid
+    // Run lock check immediately upon page load if out of trials and not paid
     window.addEventListener('DOMContentLoaded', () => {
-        if (!isPaid && trials >= maxTrials) {
+        if (localStorage.getItem('habte_is_paid') !== 'true' && trials >= maxTrials) {
             triggerPaymentLock();
         }
     });
 
-    // Global function for student answering/clicking
+    // Global function to check trial limits before launching a quiz session
     window.checkTrialLimit = function(callbackFunction) {
         if (localStorage.getItem('habte_is_paid') === 'true') {
             if (typeof callbackFunction === 'function') callbackFunction();
@@ -51,18 +51,17 @@
             localStorage.setItem('habte_trials', trials);
             if (typeof callbackFunction === 'function') callbackFunction();
             
-            // If this click hits the limit, lock immediately
+            // If this attempt reaches the max trial limit, trigger the lock
             if (trials >= maxTrials) {
-                triggerPaymentLock();
+                setTimeout(() => { triggerPaymentLock(); }, 1000);
             }
         } else {
             triggerPaymentLock();
         }
     };
 
-    function triggerPaymentLock() {
-        // Hide normal page elements or replace container content
-        const container = document.querySelector('.container') || document.body;
+    window.triggerPaymentLock = function() {
+        const container = document.getElementById('quizWorkspace') || document.querySelector('.container') || document.body;
         container.innerHTML = `
             <div class="locked-overlay">
                 <h3 style="color:#00A896; margin-top:0;">🔒 Free Trial Limit Reached</h3>
@@ -89,7 +88,7 @@
                         </div>
                     </div>
 
-                    <!-- Ref Input -->
+                    <!-- Reference Input -->
                     <div style="margin-bottom:10px;">
                         <label style="font-size:11px; font-weight:bold; color:#333; display:block; margin-bottom:4px;">Enter Transaction Ref or Phone Number:</label>
                         <input type="text" id="studentRef" placeholder="e.g. TXN12345 or 0911..." style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px; font-size:13px; box-sizing:border-box;">
@@ -99,7 +98,7 @@
                 </div>
             </div>
         `;
-    }
+    };
 })();
 
 function submitStudentPayment() {
@@ -108,6 +107,9 @@ function submitStudentPayment() {
         alert('Please enter your transaction reference or phone number.');
         return;
     }
-    alert('Thank you! Reference submitted. Once you verify payment, you can grant access.');
-    // Keep them locked out until you verify and clear their storage or build backend validation.
+    
+    // Auto-unlocks once a reference is provided (or you can hook this up to a backend database later)
+    localStorage.setItem('habte_is_paid', 'true');
+    alert('Thank you! Reference submitted: ' + ref + '\nAccess is now granted.');
+    location.reload(); 
 }
